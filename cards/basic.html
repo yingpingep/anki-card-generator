@@ -1,0 +1,74 @@
+<style>
+.basic-layout {
+    background-color: white;
+    font-size: 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 4px;
+
+    width: 100vw;
+    height: 100vh;
+}
+
+.word-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.word {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.pronunciation {
+    color: #888;
+    font-style: italic;
+}
+
+.replay-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.part-of-speech {
+    color: #888;
+    font-style: italic;
+}
+
+.meaning {
+    font-size: 24px;
+    font-weight: bold;
+}
+</style>
+
+<div class="basic-layout">
+    <div class="word-container">
+        <span class="word">
+            {{word}}
+        </span>
+        <span class="part-of-speech">
+            {{partOfSpeech}}
+        </span>
+        {{speak}}
+    </div>
+    <div>
+        <span class="pronunciation">{{pronunciation}}</span>
+    </div>
+    <div>
+        <span>{{pastTense}}</span>
+        <span>{{pp}}</span>
+    </div>
+</div>
+
+<div class="basic-layout">
+    <div class="meaning">
+        {{meaning}}
+    </div>
+    <div>
+        {{example}}
+    </div>
+</div>
