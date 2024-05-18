@@ -6,8 +6,10 @@ name = "pypi"
 [packages]
 python-dotenv = "*"
 openai = "*"
+pydantic = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.12"
