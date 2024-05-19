@@ -1,5 +1,7 @@
 import abc
 import json
+import logging
+import os.path
 
 from openai import OpenAI
 
@@ -24,11 +26,35 @@ get_card_infor_tool = {
 
 class CardGeneratorImpl(CardGenerator):
     def __init__(self, client: OpenAI):
+        self.logger = logging.getLogger(__name__)
         self.model = "gpt-3.5-turbo"
         self.client = client
-        self.prompt = "You are a great assistant. You will received an input in English. You will provide the necessary information about the input. If you are asking to provide Chinese, make sure you're returning it in Traditional Chinese. The input could be very different, before you return a result, you can take your time to think about it. If the input is invalid, you can ask for a new input."
+        self.prompt = "You are a great assistant. You will received an input in English. Your job is to generate a result about the input. If you are asking to provide Chinese, make sure you're returning it in Traditional Chinese. The input could be a phrase, a noun, or a verb, before you return a result, you can take your time to think about it."
 
     def generate(self, param: str) -> CardResult:
+        card_result = self._gen_result_via_gpt(param)
+
+        self._gen_audio_file(param)
+
+        card_result.speakFilePath = f"[sound:{param.replace(" ", "_")}.mp3]"
+        return card_result
+
+    def _gen_audio_file(self, param):
+        speech_file_path = f"out/{param.replace(' ', '_')}.mp3"
+
+        if os.path.exists(speech_file_path):
+            self.logger.info(f"Speech file already exists: {speech_file_path}")
+            return
+
+        with self.client.audio.with_streaming_response.speech.create(
+                model="tts-1",
+                voice="alloy",
+                input=param
+        ) as resp:
+            resp.stream_to_file(speech_file_path)
+            self.logger.info(f"Speech file generated: {speech_file_path}")
+
+    def _gen_result_via_gpt(self, param):
         chat_response = self.client.chat.completions.create(
             model=self.model,
             messages=[
@@ -37,11 +63,14 @@ class CardGeneratorImpl(CardGenerator):
             ],
             tools=[get_card_infor_tool]
         )
-
         msg = chat_response.choices[0].message
         tool_calls = msg.tool_calls
-        if tool_calls:
-            arguments = tool_calls[0].function.arguments
-            return CardResult(**json.loads(arguments))
-        else:
-            raise ValueError(msg.content)
+
+        if not tool_calls:
+            self.logger.error(msg.content)
+            raise ValueError("No tool calls found in response")
+
+        arguments = tool_calls[0].function.arguments
+        card_result = CardResult(**json.loads(arguments))
+
+        return card_result

@@ -28,7 +28,8 @@ def test_should_handle_word(mocker: MockFixture):
     anki_helper = AnkiHelper(CardGeneratorImpl(client))
     result = anki_helper.get_info_for("apple")
 
-    assert result == "apple,noun,apples,a fruit,ˈapəl,,蘋果,An apple a day keeps doctor away,,"
+    assert_audio_be_called(client, "apple")
+    assert result == "apple,noun,apples,a fruit,ˈapəl,[sound:apple.mp3],蘋果,An apple a day keeps doctor away,,"
 
 
 def test_should_handle_phrase(mocker: MockFixture):
@@ -45,4 +46,14 @@ def test_should_handle_phrase(mocker: MockFixture):
 
     anki_helper = AnkiHelper(CardGeneratorImpl(client))
     result = anki_helper.get_info_for("run fast")
-    assert result == "run fast,phrase,,to move quickly,ˈrən fæst,,跑快點,Run Barry run fast,,"
+
+    assert_audio_be_called(client, "run fast")
+    assert result == "run fast,phrase,,to move quickly,ˈrən fæst,[sound:run_fast.mp3],跑快點,Run Barry run fast,,"
+
+
+def assert_audio_be_called(client, param):
+    client.audio.with_streaming_response.speech.create.assert_called_with(
+        model="tts-1",
+        voice="alloy",
+        input=param
+    )
