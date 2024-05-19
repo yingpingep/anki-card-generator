@@ -29,7 +29,7 @@ class CardGeneratorImpl(CardGenerator):
         self.logger = logging.getLogger(__name__)
         self.model = "gpt-3.5-turbo"
         self.client = client
-        self.prompt = "You are a great assistant. You will received an input in English. Your job is to generate a result about the input. If you are asking to provide Chinese, make sure you're returning it in Traditional Chinese. The input could be a phrase, a noun, or a verb, before you return a result, you can take your time to think about it."
+        self.prompt = "You will act like a dictionary search engine. Your job is to retrieve necessary result about the input. The input could be a phrase, a noun, or a verb. If you are asking to provide Chinese, make sure you're returning it in Traditional Chinese. Take your time to think about it. You should keep the input as it is."
 
     def generate(self, param: str) -> CardResult:
         card_result = self._gen_result_via_gpt(param)

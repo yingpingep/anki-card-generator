@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class CardResult(BaseModel):
-    word: str
+    originInput: str = Field(..., description="The input from the user")
     partOfSpeech: str
     plural: Optional[str] = ""
     meaning: str
@@ -18,5 +18,5 @@ class CardResult(BaseModel):
     def get_csv_line(self):
         # word,partOfSpeech,plural,meaning,pronunciation,
         # speakFilePath,chinese,example,pastTense,pp
-        return (f"{self.word},{self.partOfSpeech},{self.plural},{self.meaning},{self.pronunciation},"
+        return (f"{self.originInput},{self.partOfSpeech},{self.plural},{self.meaning},{self.pronunciation},"
                 f"{self.speakFilePath},{self.chinese},{self.example},{self.pastTense},{self.pp}")
